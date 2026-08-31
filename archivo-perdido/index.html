@@ -1,1 +1,481 @@
-provisional
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0f">
+<meta name="description" content="El Archivo Perdido de Granada — aventura interactiva de misterio, memoria e inteligencia artificial.">
+<title>El Archivo Perdido de Granada</title>
+<style>
+:root{
+  --bg:#080a0f;--bg2:#0c1017;--panel:#121720;--panel2:#0d1219;--text:#f5f1e8;
+  --muted:#aeb6c1;--line:#29313c;--gold:#d9ab51;--gold2:#ffe39a;--blue:#65c7ff;
+  --green:#8ce0aa;--danger:#e6a277;--shadow:0 24px 80px rgba(0,0,0,.36)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(900px 560px at 76% -8%,rgba(67,158,255,.13),transparent 58%),
+ radial-gradient(680px 500px at 7% 18%,rgba(217,171,81,.08),transparent 62%),
+ linear-gradient(180deg,#090b10,#06080c 70%);
+ color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+button,input{font:inherit}
+button{touch-action:manipulation}
+.wrap{width:min(1020px,92vw);margin:auto;padding:20px 0 72px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.brand{font:900 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase}
+.badge{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.11em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:8px 10px;color:var(--muted);white-space:nowrap}
+.hero,.scene{border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),var(--panel);box-shadow:var(--shadow);overflow:hidden}
+.hero{display:grid;grid-template-columns:1.05fr .95fr}
+.hero-copy{padding:30px}
+.eyebrow,.progress{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em;text-transform:uppercase}
+.eyebrow{color:var(--blue)}.progress{color:var(--gold)}
+h1{font:700 clamp(42px,7vw,76px)/.94 Georgia,serif;margin:11px 0 17px}
+h2{font-size:32px;margin:7px 0 7px}
+h3{margin:0 0 7px}
+.gold{color:var(--gold2)}
+.lead{color:var(--muted);font-size:16px;line-height:1.68}
+.quote{margin-top:22px;border-left:3px solid var(--gold);background:rgba(217,171,81,.055);padding:14px 16px;border-radius:0 13px 13px 0;color:#ddd4bf;line-height:1.55}
+.hero-art{position:relative;min-height:330px;display:grid;place-items:center;overflow:hidden;background:
+ radial-gradient(circle at 50% 45%,rgba(217,171,81,.15),transparent 20%),
+ linear-gradient(140deg,#1a130c,#0c1219 62%,#07101a)}
+.hero-art:before,.hero-art:after{content:"";position:absolute;border:1px solid rgba(217,171,81,.18);border-radius:50%;width:280px;height:280px}
+.hero-art:after{width:210px;height:210px;border-color:rgba(101,199,255,.12)}
+.box-art{width:190px;height:122px;border:2px solid #8c6a32;border-radius:8px;background:
+ linear-gradient(90deg,rgba(255,255,255,.03),transparent 20%,rgba(255,255,255,.025) 70%,transparent),
+ linear-gradient(#51391b,#25190e);box-shadow:0 28px 60px rgba(0,0,0,.58);position:relative;z-index:2;transform:rotate(-2deg)}
+.box-art:before{content:"";position:absolute;left:14px;right:14px;top:48px;height:3px;background:#8c6a32}
+.box-art:after{content:"1910";position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);font:700 12px Georgia,serif;color:#e1bd75;border:1px solid #8c6a32;padding:4px 7px;border-radius:4px}
+.hud{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin:16px 0}
+.track{height:7px;border-radius:999px;background:#151b23;border:1px solid #242c36;overflow:hidden}
+.track>i{display:block;height:100%;width:20%;background:linear-gradient(90deg,var(--gold),var(--blue));transition:width .35s ease}
+.scene{padding:24px;margin-top:20px}
+.scene[hidden]{display:none!important}
+.scene-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.score{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-radius:999px;padding:8px 10px;color:var(--muted)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.card-btn{min-height:160px;text-align:left;border:1px solid var(--line);border-radius:18px;background:var(--panel2);color:var(--text);padding:17px;cursor:pointer;transition:transform .16s,border-color .16s,background .16s}
+.card-btn:hover{border-color:rgba(217,171,81,.48)}
+.card-btn:active{transform:scale(.99)}
+.card-btn.done,.card-btn.selected{border-color:rgba(140,224,170,.52);background:rgba(140,224,170,.045)}
+.card-btn .icon{font-size:34px;display:block;margin-bottom:13px}
+.card-btn b{display:block;font-size:17px;margin-bottom:7px}
+.card-btn small{display:block;color:var(--muted);line-height:1.48}
+.result{margin-top:16px;border:1px dashed #38414d;border-radius:15px;background:#0a0f15;padding:16px;min-height:80px;color:#c6ccd4;line-height:1.62}
+.result strong{color:var(--gold2)}
+.inventory{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.chip{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:7px 9px;color:#808a96}
+.chip.on{border-color:rgba(140,224,170,.45);color:var(--green)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{min-height:44px;border:1px solid var(--line);border-radius:13px;background:#111821;color:var(--text);padding:12px 15px;font-weight:800;cursor:pointer}
+.btn.primary{background:linear-gradient(110deg,#9f762d,#e4bd60,#aa7e31);border-color:#ba9244;color:#161109}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:focus-visible,.card-btn:focus-visible,.hotspot:focus-visible,input:focus-visible{outline:3px solid rgba(101,199,255,.48);outline-offset:2px}
+.photo{position:relative;aspect-ratio:16/10;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:17px;background:
+ linear-gradient(180deg,rgba(32,23,12,.12),rgba(25,16,8,.55)),
+ linear-gradient(12deg,transparent 0 48%,rgba(255,238,192,.08) 49% 50%,transparent 51%),
+ repeating-linear-gradient(90deg,#786545 0 4px,#594931 4px 8px);
+ display:grid;place-items:center}
+.photo:before{content:"";position:absolute;inset:10%;border:1px solid rgba(255,238,192,.18);transform:rotate(-1deg)}
+.photo-label{font:700 clamp(20px,4vw,34px) Georgia,serif;color:#efe1bc;text-align:center;padding:20px;text-shadow:0 2px 5px #000;z-index:1}
+.hotspot{position:absolute;width:50px;height:50px;border-radius:50%;border:2px solid var(--gold);background:rgba(0,0,0,.62);color:var(--gold2);font-weight:900;cursor:pointer;z-index:2}
+.hotspot.one{left:12%;top:22%}.hotspot.two{left:56%;top:55%}.hotspot.three{right:9%;top:19%}
+.room{position:relative;aspect-ratio:16/8;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:17px;background:
+ linear-gradient(180deg,rgba(8,10,14,.1),rgba(8,10,14,.8)),
+ repeating-linear-gradient(90deg,#2c241c 0 52px,#251e18 52px 55px);
+ display:grid;place-items:end center;padding:18px}
+.door{position:absolute;width:110px;height:70%;top:12%;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#261a10,#51361d,#261a10);border:2px solid #74512b;border-radius:7px 7px 0 0}
+.lock{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:32px;height:40px;border:2px solid var(--gold);border-radius:8px;background:#1a120c;color:var(--gold2);display:grid;place-items:center;font-weight:900}
+.codebox{position:relative;z-index:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;background:rgba(6,8,11,.82);border:1px solid var(--line);border-radius:14px;padding:12px}
+.codebox label{font-size:13px;color:var(--muted)}
+.codebox input{width:110px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#080c11;color:white;padding:10px 12px;font-size:16px}
+.archive-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.archive-item{border:1px solid var(--line);border-radius:16px;background:#0d131a;color:var(--text);padding:16px;text-align:left;cursor:pointer}
+.archive-item.done{border-color:rgba(140,224,170,.48);background:rgba(140,224,170,.04)}
+.archive-item b{display:block;color:var(--gold2);margin-bottom:6px}
+.archive-item span{color:var(--muted);font-size:13px;line-height:1.47}
+.ending{text-align:center;padding:10px 0 2px}
+.ending-mark{font-size:48px}
+.ending h2{font:700 clamp(34px,6vw,58px) Georgia,serif;color:var(--gold2);margin:10px 0}
+.ending p{max-width:690px;margin:0 auto;color:var(--muted);line-height:1.7}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px auto;max-width:720px}
+.summary>div{border:1px solid var(--line);border-radius:14px;padding:13px;background:#0c1118}
+.summary b{display:block;color:var(--gold2);font-size:18px}.summary span{font-size:11px;color:var(--muted)}
+.footer{text-align:center;color:#707a87;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em;text-transform:uppercase;margin-top:25px}
+@media(max-width:780px){
+ .hero{grid-template-columns:1fr}.hero-art{min-height:220px}
+ .grid3,.archive-grid,.summary{grid-template-columns:1fr}
+ .scene{padding:18px}
+ .scene-head{align-items:center}
+ .room{aspect-ratio:4/3}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div class="brand">El Archivo Perdido de Granada</div>
+    <div class="badge">Edición definitiva · V1.0</div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Aventura interactiva · Misterio · Granada</div>
+      <h1>Descubre.<br><span class="gold">Decide.</span><br>Recupera.</h1>
+      <p class="lead">Álex encuentra una caja escondida durante unas obras en el centro de Granada. Dentro hay una fotografía antigua, una llave oxidada y una carta medio quemada.</p>
+      <div class="quote">“No busques lo que desapareció. Busca lo que nadie quiso recordar.”</div>
+    </div>
+    <div class="hero-art" aria-label="Ilustración estilizada de una caja antigua">
+      <div class="box-art" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="hud" aria-label="Progreso del juego">
+    <div class="track"><i id="progressBar"></i></div>
+    <div class="badge" id="progressText">Escena 1/5</div>
+  </div>
+
+  <section class="scene" id="scene1">
+    <div class="scene-head">
+      <div><div class="progress">Escena 1 de 5</div><h2>La caja</h2></div>
+      <div class="score" id="score1">Pistas 0/3</div>
+    </div>
+    <p class="lead">Examina los tres objetos. Cuando hayas relacionado las pistas podrás continuar.</p>
+    <div class="grid3">
+      <button class="card-btn" type="button" data-clue="photo">
+        <span class="icon">🖼️</span><b>Fotografía</b>
+        <small>Una vista antigua de Granada. El reverso tiene un símbolo y una fecha incompleta.</small>
+      </button>
+      <button class="card-btn" type="button" data-clue="key">
+        <span class="icon">🗝️</span><b>Llave</b>
+        <small>Está oxidada y tiene un número grabado en el mango.</small>
+      </button>
+      <button class="card-btn" type="button" data-clue="letter">
+        <span class="icon">📜</span><b>Carta quemada</b>
+        <small>El papel está dañado, pero el mensaje principal sigue legible.</small>
+      </button>
+    </div>
+    <div class="result" id="result1" aria-live="polite">Toca un objeto para comenzar.</div>
+    <div class="inventory">
+      <span class="chip" data-chip="photo">Fotografía</span>
+      <span class="chip" data-chip="key">Llave 1910</span>
+      <span class="chip" data-chip="letter">Mensaje</span>
+    </div>
+    <div class="actions">
+      <button class="btn" type="button" id="resetGame">Reiniciar juego</button>
+      <button class="btn primary" type="button" id="to2" disabled>Continuar a la fotografía →</button>
+    </div>
+  </section>
+
+  <section class="scene" id="scene2" hidden>
+    <div class="scene-head">
+      <div><div class="progress">Escena 2 de 5</div><h2>La fotografía</h2></div>
+      <div class="score" id="score2">Zona sin resolver</div>
+    </div>
+    <p class="lead">La llave dice 1910. Busca en la imagen el mismo símbolo que aparece en la carta.</p>
+    <div class="photo">
+      <div class="photo-label">GRANADA · ARCHIVO FOTOGRÁFICO · 1910</div>
+      <button class="hotspot one" type="button" data-zone="1" aria-label="Examinar tejado">?</button>
+      <button class="hotspot two" type="button" data-zone="2" aria-label="Examinar balcón">?</button>
+      <button class="hotspot three" type="button" data-zone="3" aria-label="Examinar calle">?</button>
+    </div>
+    <div class="result" id="result2" aria-live="polite">Hay tres zonas sospechosas. Solo una contiene la pista correcta.</div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="to3" disabled>Seguir la pista →</button>
+    </div>
+  </section>
+
+  <section class="scene" id="scene3" hidden>
+    <div class="progress">Escena 3 de 5</div>
+    <h2>El lugar olvidado</h2>
+    <p class="lead">El símbolo conduce a la referencia de un edificio que ya no existe. Elige cómo investigar. Las tres rutas son válidas, pero cada una revela una parte distinta del misterio.</p>
+    <div class="grid3">
+      <button class="card-btn" type="button" data-route="archive">
+        <span class="icon">📚</span><b>Archivo histórico</b>
+        <small>Buscar planos, fotografías y documentos.</small>
+      </button>
+      <button class="card-btn" type="button" data-route="neighbor">
+        <span class="icon">👴</span><b>Memoria del barrio</b>
+        <small>Preguntar por recuerdos que nunca llegaron a los papeles.</small>
+      </button>
+      <button class="card-btn" type="button" data-route="ai">
+        <span class="icon">🤖</span><b>Consultar IA</b>
+        <small>Relacionar símbolos, fechas y fragmentos de información.</small>
+      </button>
+    </div>
+    <div class="result" id="result3" aria-live="polite">Elige una línea de investigación.</div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="to4" disabled>Ir a la puerta →</button>
+    </div>
+  </section>
+
+  <section class="scene" id="scene4" hidden>
+    <div class="scene-head">
+      <div><div class="progress">Escena 4 de 5</div><h2>La puerta</h2></div>
+      <div class="score" id="score4">Cerrada</div>
+    </div>
+    <p class="lead">La investigación conduce a una puerta antigua. La llave entra en la cerradura, pero un pequeño mecanismo pide un código de cuatro cifras.</p>
+    <div class="room">
+      <div class="door"><div class="lock">⌁</div></div>
+      <form class="codebox" id="codeForm">
+        <label for="code">Código encontrado en la investigación</label>
+        <input id="code" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" placeholder="0000" aria-label="Código de cuatro cifras">
+        <button class="btn primary" type="submit">Abrir</button>
+      </form>
+    </div>
+    <div class="result" id="result4" aria-live="polite">Pista: ya has visto el número varias veces durante el juego.</div>
+
+    <div id="archiveInside" hidden>
+      <h3 style="margin-top:20px">Dentro de la habitación</h3>
+      <p class="lead">No hay oro. Hay algo más valioso para la historia del barrio: un pequeño archivo escondido.</p>
+      <div class="archive-grid">
+        <button class="archive-item" type="button" data-evidence="newspaper"><b>📰 Periódico</b><span>Una noticia sobre la demolición de varios edificios del entorno.</span></button>
+        <button class="archive-item" type="button" data-evidence="family"><b>📷 Fotografías familiares</b><span>Retratos y escenas cotidianas con nombres escritos detrás.</span></button>
+        <button class="archive-item" type="button" data-evidence="ledger"><b>📖 Libro de nombres</b><span>Vecinos, comercios y pequeñas historias anotadas durante décadas.</span></button>
+      </div>
+      <div class="result" id="evidenceResult" aria-live="polite">Examina los tres elementos para entender qué protegía realmente esta habitación.</div>
+      <div class="actions">
+        <button class="btn primary" type="button" id="to5" disabled>Descubrir el secreto →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="scene5" hidden>
+    <div class="progress">Escena 5 de 5</div>
+    <h2>El secreto</h2>
+    <p class="lead">La habitación era un archivo comunitario. Alguien lo escondió cuando el edificio iba a desaparecer para que las vidas del barrio no se borraran con sus paredes.</p>
+    <div class="quote">“Una ciudad no desaparece cuando derriban sus edificios. Desaparece cuando nadie recuerda quién vivió dentro.”</div>
+    <h3 style="margin-top:22px">¿Qué harías con el archivo?</h3>
+    <div class="grid3">
+      <button class="card-btn" type="button" data-ending="public"><span class="icon">🏛️</span><b>Entregarlo a un archivo público</b><small>Conservarlo y hacerlo accesible para investigadores y vecinos.</small></button>
+      <button class="card-btn" type="button" data-ending="digital"><span class="icon">✨</span><b>Digitalizarlo con IA</b><small>Catalogar las piezas, restaurar copias y crear una experiencia para conocerlas.</small></button>
+      <button class="card-btn" type="button" data-ending="community"><span class="icon">🤝</span><b>Devolverlo al barrio</b><small>Crear una exposición comunitaria y recoger nuevas historias.</small></button>
+    </div>
+
+    <div class="ending" id="ending" hidden>
+      <div class="ending-mark" id="endingMark">✦</div>
+      <h2 id="endingTitle">Memoria recuperada</h2>
+      <p id="endingText"></p>
+      <div class="summary">
+        <div><b id="summaryClues">3/3</b><span>Pistas iniciales</span></div>
+        <div><b id="summaryEvidence">3/3</b><span>Pruebas del archivo</span></div>
+        <div><b id="summaryRoute">—</b><span>Ruta elegida</span></div>
+      </div>
+      <div class="actions" style="justify-content:center">
+        <button class="btn primary" type="button" id="playAgain">Jugar otra vez</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">Juego completo · HTML + CSS + JavaScript · Sin servidores ni pagos</div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => Array.from(root.querySelectorAll(s));
+
+  const state = {
+    clues: new Set(),
+    route: null,
+    photoSolved: false,
+    doorOpen: false,
+    evidence: new Set(),
+    ending: null
+  };
+
+  const scene = n => $("#scene" + n);
+  const progressBar = $("#progressBar");
+  const progressText = $("#progressText");
+
+  function setProgress(n){
+    progressBar.style.width = (n * 20) + "%";
+    progressText.textContent = "Escena " + n + "/5";
+  }
+
+  function showScene(n){
+    scene(n).hidden = false;
+    setProgress(n);
+    scene(n).scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  const clueText = {
+    photo: "<strong>Fotografía:</strong> en el reverso aparece un símbolo dibujado a mano y una fecha incompleta: <b>19_0</b>.",
+    key: "<strong>Llave:</strong> el metal está gastado, pero el grabado se lee con claridad: <b>1910</b>.",
+    letter: "<strong>Carta:</strong> «No busques lo que desapareció. Busca lo que nadie quiso recordar.»"
+  };
+
+  $$("[data-clue]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.clue;
+      state.clues.add(key);
+      btn.classList.add("done");
+      const chip = $(`[data-chip="${key}"]`);
+      if (chip) chip.classList.add("on");
+      $("#result1").innerHTML = clueText[key];
+      $("#score1").textContent = "Pistas " + state.clues.size + "/3";
+      if(state.clues.size === 3){
+        $("#to2").disabled = false;
+        $("#result1").innerHTML += "<br><br><strong>Conexión encontrada:</strong> la llave completa la fecha de la fotografía: 1910.";
+      }
+    });
+  });
+
+  $("#to2").addEventListener("click", () => {
+    if(state.clues.size === 3) showScene(2);
+  });
+
+  $$("[data-zone]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if(btn.dataset.zone === "2"){
+        state.photoSolved = true;
+        $("#score2").textContent = "Pista encontrada";
+        $("#result2").innerHTML = "<strong>Correcto.</strong> Bajo el balcón aparece el mismo símbolo de la carta. Junto a él hay una pequeña referencia: <b>Casa 17</b>.";
+        $("#to3").disabled = false;
+        btn.style.borderColor = "var(--green)";
+      } else {
+        $("#result2").textContent = "No hay nada útil aquí. Prueba otra zona de la fotografía.";
+      }
+    });
+  });
+
+  $("#to3").addEventListener("click", () => {
+    if(state.photoSolved) showScene(3);
+  });
+
+  const routeText = {
+    archive: "<strong>Archivo histórico:</strong> un plano antiguo relaciona «Casa 17» con una habitación interior que no figura en reformas posteriores.",
+    neighbor: "<strong>Memoria del barrio:</strong> un vecino recuerda que su abuelo hablaba de «la habitación de las fotos», cerrada antes de una demolición.",
+    ai: "<strong>Consulta IA:</strong> al relacionar 1910, Casa 17 y el símbolo, aparecen coincidencias entre notas, fotografías y una dirección desaparecida."
+  };
+  const routeLabel = {archive:"Archivo",neighbor:"Barrio",ai:"IA"};
+
+  $$("[data-route]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.route = btn.dataset.route;
+      $$("[data-route]").forEach(x => x.classList.remove("selected"));
+      btn.classList.add("selected");
+      $("#result3").innerHTML = routeText[state.route];
+      $("#to4").disabled = false;
+    });
+  });
+
+  $("#to4").addEventListener("click", () => {
+    if(state.route) showScene(4);
+  });
+
+  $("#codeForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const value = $("#code").value.replace(/\D/g,"").slice(0,4);
+    $("#code").value = value;
+    if(value === "1910"){
+      state.doorOpen = true;
+      $("#score4").textContent = "Abierta";
+      $("#result4").innerHTML = "<strong>La cerradura cede.</strong> La llave gira y el mecanismo reconoce el código 1910.";
+      $("#archiveInside").hidden = false;
+      $("#archiveInside").scrollIntoView({behavior:"smooth", block:"start"});
+    } else {
+      $("#result4").innerHTML = "<strong>Código incorrecto.</strong> Revisa las pistas de la caja y la fotografía.";
+    }
+  });
+
+  const evidenceText = {
+    newspaper:"El periódico confirma que el edificio estaba condenado a desaparecer.",
+    family:"Las fotografías ponen rostros y nombres a las personas que vivieron allí.",
+    ledger:"El libro demuestra que alguien intentó conservar conscientemente la memoria cotidiana del barrio."
+  };
+
+  $$("[data-evidence]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.evidence;
+      state.evidence.add(key);
+      btn.classList.add("done");
+      $("#evidenceResult").innerHTML = "<strong>" + state.evidence.size + "/3 pruebas:</strong> " + evidenceText[key];
+      if(state.evidence.size === 3){
+        $("#to5").disabled = false;
+        $("#evidenceResult").innerHTML += "<br><br><strong>Conclusión:</strong> no era un escondite de objetos valiosos. Era un archivo creado para salvar recuerdos.";
+      }
+    });
+  });
+
+  $("#to5").addEventListener("click", () => {
+    if(state.evidence.size === 3) showScene(5);
+  });
+
+  const endingData = {
+    public:{
+      mark:"🏛️",
+      title:"Archivo protegido",
+      text:"Entregas las piezas a una institución pública. El archivo se conserva, se cataloga y queda disponible para futuras investigaciones."
+    },
+    digital:{
+      mark:"✨",
+      title:"Memoria digital",
+      text:"Creas copias digitales, organizas los documentos y utilizas IA para ayudar a describir y explorar el archivo sin alterar los originales."
+    },
+    community:{
+      mark:"🤝",
+      title:"La memoria vuelve a casa",
+      text:"El barrio recupera sus fotografías y nombres. La exposición hace que nuevas familias reconozcan personas, lugares y pequeñas historias olvidadas."
+    }
+  };
+
+  $$("[data-ending]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.ending = btn.dataset.ending;
+      $$("[data-ending]").forEach(x => x.classList.remove("selected"));
+      btn.classList.add("selected");
+      const d = endingData[state.ending];
+      $("#endingMark").textContent = d.mark;
+      $("#endingTitle").textContent = d.title;
+      $("#endingText").textContent = d.text;
+      $("#summaryClues").textContent = state.clues.size + "/3";
+      $("#summaryEvidence").textContent = state.evidence.size + "/3";
+      $("#summaryRoute").textContent = routeLabel[state.route] || "—";
+      $("#ending").hidden = false;
+      progressBar.style.width = "100%";
+      progressText.textContent = "Completado";
+      $("#ending").scrollIntoView({behavior:"smooth", block:"center"});
+    });
+  });
+
+  function reset(){
+    state.clues.clear();
+    state.route = null;
+    state.photoSolved = false;
+    state.doorOpen = false;
+    state.evidence.clear();
+    state.ending = null;
+
+    [2,3,4,5].forEach(n => scene(n).hidden = true);
+    $$(".done,.selected").forEach(x => x.classList.remove("done","selected"));
+    $$("[data-chip]").forEach(x => x.classList.remove("on"));
+    $("#score1").textContent = "Pistas 0/3";
+    $("#result1").textContent = "Toca un objeto para comenzar.";
+    $("#result2").textContent = "Hay tres zonas sospechosas. Solo una contiene la pista correcta.";
+    $("#score2").textContent = "Zona sin resolver";
+    $("#result3").textContent = "Elige una línea de investigación.";
+    $("#score4").textContent = "Cerrada";
+    $("#result4").textContent = "Pista: ya has visto el número varias veces durante el juego.";
+    $("#archiveInside").hidden = true;
+    $("#evidenceResult").textContent = "Examina los tres elementos para entender qué protegía realmente esta habitación.";
+    $("#ending").hidden = true;
+    $("#code").value = "";
+    $("#to2").disabled = true;
+    $("#to3").disabled = true;
+    $("#to4").disabled = true;
+    $("#to5").disabled = true;
+    setProgress(1);
+    scene(1).scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  $("#resetGame").addEventListener("click", reset);
+  $("#playAgain").addEventListener("click", reset);
+  setProgress(1);
+})();
+</script>
+</body>
+</html>
